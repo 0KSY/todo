@@ -1,8 +1,11 @@
 package com.solo.todo.member.dto;
 
+import com.solo.todo.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
 
 public class MemberDto {
 
@@ -10,7 +13,9 @@ public class MemberDto {
     @Setter
     public static class Post{
 
+        @NotBlank
         private String email;
+        @NotBlank
         private String nickname;
 
     }
@@ -21,6 +26,7 @@ public class MemberDto {
 
         private long memberId;
         private String nickname;
+        private Member.MemberStatus memberStatus;
 
     }
 
@@ -32,6 +38,7 @@ public class MemberDto {
         private long memberId;
         private String email;
         private String nickname;
+        private Member.MemberStatus memberStatus;
 
     }
 

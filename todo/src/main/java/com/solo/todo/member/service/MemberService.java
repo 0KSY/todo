@@ -1,11 +1,15 @@
 package com.solo.todo.member.service;
 
+import com.solo.todo.exception.BusinessLogicException;
+import com.solo.todo.exception.ExceptionCode;
 import com.solo.todo.member.entity.Member;
 import com.solo.todo.member.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class MemberService {
@@ -16,22 +20,48 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
+
+    public Member findVerifiedMember(long memberId){
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+
+        Member findMember = optionalMember
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+
+        return findMember;
+    }
+
+    public void verifyExistsEmail(String email){
+        Optional<Member> optionalMember = memberRepository.findByEmail(email);
+
+        if(optionalMember.isPresent()){
+            throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
+        }
+    }
+
     public Member createMember(Member member){
+
+        verifyExistsEmail(member.getEmail());
 
         return memberRepository.save(member);
     }
 
     public Member updateMember(Member member){
-        Member findMember = memberRepository.findById(member.getMemberId()).get();
+        Member findMember = findVerifiedMember(member.getMemberId());
 
-        findMember.setNickname(member.getNickname());
+        Optional.ofNullable(member.getNickname())
+                        .ifPresent(nickname -> findMember.setNickname(nickname));
+        Optional.ofNullable(member.getMemberStatus())
+                        .ifPresent(memberStatus -> findMember.setMemberStatus(memberStatus));
 
         return memberRepository.save(findMember);
 
     }
 
     public Member findMember(long memberId){
-        return memberRepository.findById(memberId).get();
+
+        Member findMember = findVerifiedMember(memberId);
+
+        return findMember;
     }
 
     public Page<Member> findMembers(int page, int size){
@@ -41,6 +71,8 @@ public class MemberService {
     }
 
     public void deleteMember(long memberId){
-        memberRepository.deleteById(memberId);
+        Member findMember = findVerifiedMember(memberId);
+
+        memberRepository.delete(findMember);
     }
 }
