@@ -35,8 +35,6 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
 
 
-
-
 }
 
 tasks.named('test') {
