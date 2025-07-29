@@ -1,5 +1,6 @@
 package com.solo.todo.todo.entity;
 
+import com.solo.todo.audit.Auditable;
 import com.solo.todo.member.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Todo {
+public class Todo extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

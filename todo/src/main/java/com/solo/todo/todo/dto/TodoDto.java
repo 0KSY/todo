@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
 
 public class TodoDto {
 
@@ -38,5 +39,7 @@ public class TodoDto {
         private String title;
         private String description;
         private Todo.IsCompleted isCompleted;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
     }
 }
