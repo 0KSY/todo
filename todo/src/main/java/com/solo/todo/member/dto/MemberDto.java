@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 public class MemberDto {
 
@@ -39,6 +40,8 @@ public class MemberDto {
         private String email;
         private String nickname;
         private Member.MemberStatus memberStatus;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
 
     }
 
