@@ -29,3 +29,10 @@ server:
   servlet:
     encoding:
       force-response: true
+mail:
+  address:
+    admin: admin@gmail.com
+jwt:
+  key: aaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbb
+  access-token-expiration-minutes: 1
+  refresh-token-expiration-minutes: 1
