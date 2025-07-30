@@ -1,5 +1,6 @@
 package com.solo.todo.member.service;
 
+import com.solo.todo.auth.utils.CustomAuthorityUtils;
 import com.solo.todo.exception.BusinessLogicException;
 import com.solo.todo.exception.ExceptionCode;
 import com.solo.todo.member.entity.Member;
@@ -7,9 +8,11 @@ import com.solo.todo.member.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,11 +20,15 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final CustomAuthorityUtils customAuthorityUtils;
+    private final PasswordEncoder passwordEncoder;
 
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository,
+                         CustomAuthorityUtils customAuthorityUtils, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
+        this.customAuthorityUtils = customAuthorityUtils;
+        this.passwordEncoder = passwordEncoder;
     }
-
 
     public Member findVerifiedMember(long memberId){
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -43,6 +50,12 @@ public class MemberService {
     public Member createMember(Member member){
 
         verifyExistsEmail(member.getEmail());
+
+        String encryptedPassword = passwordEncoder.encode(member.getPassword());
+        member.setPassword(encryptedPassword);
+
+        List<String> roles = customAuthorityUtils.createRoles(member.getEmail());
+        member.setRoles(roles);
 
         return memberRepository.save(member);
     }
