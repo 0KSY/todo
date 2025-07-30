@@ -6,6 +6,7 @@ public enum ExceptionCode {
 
     MEMBER_NOT_FOUND(404, "Member not found"),
     MEMBER_EXISTS(409, "Member exists"),
+    MEMBER_NICKNAME_EXISTS(409, "Member nickname exists"),
     TODO_NOT_FOUND(404, "Todo not found");
 
     @Getter
