@@ -47,9 +47,18 @@ public class MemberService {
         }
     }
 
+    public void verifyExistsNickname(String nickname){
+        Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
+
+        if(optionalMember.isPresent()){
+            throw new BusinessLogicException(ExceptionCode.MEMBER_NICKNAME_EXISTS);
+        }
+    }
+
     public Member createMember(Member member){
 
         verifyExistsEmail(member.getEmail());
+        verifyExistsNickname(member.getNickname());
 
         String encryptedPassword = passwordEncoder.encode(member.getPassword());
         member.setPassword(encryptedPassword);
@@ -64,7 +73,12 @@ public class MemberService {
         Member findMember = findVerifiedMember(member.getMemberId());
 
         Optional.ofNullable(member.getNickname())
-                        .ifPresent(nickname -> findMember.setNickname(nickname));
+                        .ifPresent(nickname -> {
+                            if(!nickname.equals(findMember.getNickname())){
+                                verifyExistsNickname(nickname);
+                            }
+                            findMember.setNickname(nickname);
+                        });
         Optional.ofNullable(member.getMemberStatus())
                         .ifPresent(memberStatus -> findMember.setMemberStatus(memberStatus));
 
