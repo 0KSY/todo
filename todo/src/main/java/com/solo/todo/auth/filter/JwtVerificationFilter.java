@@ -1,6 +1,7 @@
 package com.solo.todo.auth.filter;
 
 import com.solo.todo.auth.jwt.JwtTokenizer;
+import com.solo.todo.auth.userDetailsService.CustomUserDetails;
 import com.solo.todo.auth.utils.CustomAuthorityUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -11,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,13 +73,19 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     }
 
     private void setAuthenticationToContext(Map<String, Object> claims){
+        int memberId = (int) claims.get("memberId");
         String username = (String) claims.get("username");
         List<String> roles = (List) claims.get("roles");
 
         List<GrantedAuthority> authorities = customAuthorityUtils.createAuthorities(roles);
 
+        CustomUserDetails customUserDetails = new CustomUserDetails();
+        customUserDetails.setMemberId((long) memberId);
+        customUserDetails.setEmail(username);
+        customUserDetails.setAuthorities(authorities);
+
         Authentication authentication
-                = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                = new UsernamePasswordAuthenticationToken(customUserDetails, null, authorities);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

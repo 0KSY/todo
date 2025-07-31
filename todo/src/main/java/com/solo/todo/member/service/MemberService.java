@@ -1,6 +1,7 @@
 package com.solo.todo.member.service;
 
 import com.solo.todo.auth.jwt.JwtTokenizer;
+import com.solo.todo.auth.userDetailsService.CustomUserDetails;
 import com.solo.todo.auth.utils.CustomAuthorityUtils;
 import com.solo.todo.exception.BusinessLogicException;
 import com.solo.todo.exception.ExceptionCode;
@@ -58,15 +59,14 @@ public class MemberService {
         }
     }
 
-    public void checkMemberId(long memberId, String accessToken){
+    public void checkMemberId(long memberId, CustomUserDetails customUserDetails){
 
-        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-        long findMemberId = jwtTokenizer.getMemberIdFromAccessToken(accessToken, base64EncodedSecretKey);
-
-        if(memberId != findMemberId){
+        if(memberId != customUserDetails.getMemberId()){
             throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_MATCHED);
         }
+
     }
+
 
     public Member createMember(Member member){
 
@@ -82,10 +82,10 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public Member updateMember(Member member, String accessToken){
+    public Member updateMember(Member member, CustomUserDetails customUserDetails){
         Member findMember = findVerifiedMember(member.getMemberId());
 
-        checkMemberId(findMember.getMemberId(), accessToken);
+        checkMemberId(findMember.getMemberId(), customUserDetails);
 
         Optional.ofNullable(member.getNickname())
                         .ifPresent(nickname -> {
@@ -101,11 +101,11 @@ public class MemberService {
 
     }
 
-    public Member findMember(long memberId, String accessToken){
+    public Member findMember(long memberId, CustomUserDetails customUserDetails){
 
         Member findMember = findVerifiedMember(memberId);
 
-        checkMemberId(findMember.getMemberId(), accessToken);
+        checkMemberId(findMember.getMemberId(), customUserDetails);
 
         return findMember;
     }
@@ -116,9 +116,9 @@ public class MemberService {
         );
     }
 
-    public void deleteMember(long memberId, String accessToken){
+    public void deleteMember(long memberId, CustomUserDetails customUserDetails){
         Member findMember = findVerifiedMember(memberId);
-        checkMemberId(findMember.getMemberId(), accessToken);
+        checkMemberId(findMember.getMemberId(), customUserDetails);
 
         memberRepository.delete(findMember);
     }

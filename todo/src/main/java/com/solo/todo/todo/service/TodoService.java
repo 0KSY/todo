@@ -1,6 +1,7 @@
 package com.solo.todo.todo.service;
 
 
+import com.solo.todo.auth.userDetailsService.CustomUserDetails;
 import com.solo.todo.exception.BusinessLogicException;
 import com.solo.todo.exception.ExceptionCode;
 import com.solo.todo.member.service.MemberService;
@@ -36,18 +37,18 @@ public class TodoService {
 
     }
 
-    public Todo createTodo(Todo todo, String accessToken){
+    public Todo createTodo(Todo todo, CustomUserDetails customUserDetails){
 
-        memberService.checkMemberId(todo.getMember().getMemberId(), accessToken);
+        memberService.checkMemberId(todo.getMember().getMemberId(), customUserDetails);
 
         return todoRepository.save(todo);
     }
 
-    public Todo updateTodo(Todo todo, String accessToken){
-
-        memberService.checkMemberId(todo.getMember().getMemberId(), accessToken);
+    public Todo updateTodo(Todo todo, CustomUserDetails customUserDetails){
 
         Todo findTodo = findVerifiedTodo(todo.getTodoId());
+
+        memberService.checkMemberId(findTodo.getMember().getMemberId(), customUserDetails);
 
         Optional.ofNullable(todo.getTitle())
                 .ifPresent(title -> findTodo.setTitle(title));
@@ -63,38 +64,31 @@ public class TodoService {
 
     }
 
-    public Todo findTodo(long todoId, String accessToken){
+    public Todo findTodo(long todoId, CustomUserDetails customUserDetails){
 
         Todo findTodo = findVerifiedTodo(todoId);
 
-        memberService.checkMemberId(findTodo.getMember().getMemberId(), accessToken);
+        memberService.checkMemberId(findTodo.getMember().getMemberId(), customUserDetails);
 
         return findTodo;
     }
 
-    public Page<Todo> findTodos(int page, int size, String accessToken){
+    public Page<Todo> findTodos(int page, int size, CustomUserDetails customUserDetails){
 
-        Page<Todo> pageTodos = todoRepository.findAll(
-                PageRequest.of(page, size, Sort.by("todoId").descending()));
+        long memberId = customUserDetails.getMemberId();
 
-        if(pageTodos.isEmpty()){
-            return pageTodos;
-        }
-
-        Todo todo = pageTodos.getContent().get(0);
-
-        memberService.checkMemberId(todo.getMember().getMemberId(), accessToken);
-
-        return pageTodos;
+        return todoRepository.findAllByMember_MemberId(
+                memberId, PageRequest.of(page, size, Sort.by("todoId").descending()));
 
     }
 
-    public void deleteTodo(long todoId, String accessToken){
+    public void deleteTodo(long todoId, CustomUserDetails customUserDetails){
         Todo findTodo = findVerifiedTodo(todoId);
 
-        memberService.checkMemberId(findTodo.getMember().getMemberId(), accessToken);
+        memberService.checkMemberId(findTodo.getMember().getMemberId(), customUserDetails);
 
         todoRepository.delete(findTodo);
+
     }
 
 
