@@ -1,5 +1,6 @@
 package com.solo.todo.todo.controller;
 
+import com.solo.todo.auth.userDetailsService.CustomUserDetails;
 import com.solo.todo.dto.MultiResponseDto;
 import com.solo.todo.dto.SingleResponseDto;
 import com.solo.todo.todo.dto.TodoDto;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +37,9 @@ public class TodoController {
 
     @PostMapping
     public ResponseEntity postTodo(@RequestBody @Valid TodoDto.Post todoPostDto,
-                                   @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
+                                   @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        Todo todo = todoService.createTodo(mapper.todoPostDtoToTodo(todoPostDto), accessToken);
+        Todo todo = todoService.createTodo(mapper.todoPostDtoToTodo(todoPostDto), customUserDetails);
 
         URI location = UriCreator.createUri(TODO_DEFAULT_URL, todo.getTodoId());
 
@@ -48,11 +50,11 @@ public class TodoController {
     @PatchMapping("/{todo-id}")
     public ResponseEntity patchTodo(@RequestBody @Valid TodoDto.Patch todoPatchDto,
                                     @PathVariable("todo-id") @Positive long todoId,
-                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
+                                    @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
         todoPatchDto.setTodoId(todoId);
 
-        Todo todo = todoService.updateTodo(mapper.todoPatchDtoToTodo(todoPatchDto), accessToken);
+        Todo todo = todoService.updateTodo(mapper.todoPatchDtoToTodo(todoPatchDto), customUserDetails);
 
         return new ResponseEntity(new SingleResponseDto<>(mapper.todoToTodoResponseDto(todo)), HttpStatus.OK);
 
@@ -60,9 +62,9 @@ public class TodoController {
 
     @GetMapping("/{todo-id}")
     public ResponseEntity getTodo(@PathVariable("todo-id") @Positive long todoId,
-                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
+                                  @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        Todo todo = todoService.findTodo(todoId, accessToken);
+        Todo todo = todoService.findTodo(todoId, customUserDetails);
 
         return new ResponseEntity(new SingleResponseDto<>(mapper.todoToTodoResponseDto(todo)), HttpStatus.OK);
     }
@@ -70,9 +72,9 @@ public class TodoController {
     @GetMapping
     public ResponseEntity getTodos(@RequestParam @Positive int page,
                                    @RequestParam @Positive int size,
-                                   @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
+                                   @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        Page<Todo> pageTodos = todoService.findTodos(page-1, size, accessToken);
+        Page<Todo> pageTodos = todoService.findTodos(page-1, size, customUserDetails);
         List<Todo> todos = pageTodos.getContent();
 
         return new ResponseEntity(
@@ -81,9 +83,9 @@ public class TodoController {
 
     @DeleteMapping("/{todo-id}")
     public ResponseEntity deleteTodo(@PathVariable("todo-id") @Positive long todoId,
-                                     @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
+                                     @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        todoService.deleteTodo(todoId, accessToken);
+        todoService.deleteTodo(todoId, customUserDetails);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
 

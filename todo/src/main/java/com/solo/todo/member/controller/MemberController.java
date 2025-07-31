@@ -1,5 +1,6 @@
 package com.solo.todo.member.controller;
 
+import com.solo.todo.auth.userDetailsService.CustomUserDetails;
 import com.solo.todo.dto.MultiResponseDto;
 import com.solo.todo.dto.SingleResponseDto;
 import com.solo.todo.member.dto.MemberDto;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,11 +49,11 @@ public class MemberController {
     @PatchMapping("/{member-id}")
     public ResponseEntity patchMember(@RequestBody @Valid MemberDto.Patch memberPatchDto,
                                       @PathVariable("member-id") @Positive long memberId,
-                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
+                                      @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
         memberPatchDto.setMemberId(memberId);
 
-        Member member = memberService.updateMember(mapper.memberPatchDtoToMember(memberPatchDto), accessToken);
+        Member member = memberService.updateMember(mapper.memberPatchDtoToMember(memberPatchDto), customUserDetails);
 
         return new ResponseEntity(new SingleResponseDto<>(mapper.memberToMemberResponseDto(member)), HttpStatus.OK);
 
@@ -59,9 +61,9 @@ public class MemberController {
 
     @GetMapping("/{member-id}")
     public ResponseEntity getMember(@PathVariable("member-id") @Positive long memberId,
-                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
+                                    @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        Member member = memberService.findMember(memberId, accessToken);
+        Member member = memberService.findMember(memberId, customUserDetails);
 
         return new ResponseEntity(new SingleResponseDto<>(mapper.memberToMemberResponseDto(member)), HttpStatus.OK);
 
@@ -82,9 +84,9 @@ public class MemberController {
 
     @DeleteMapping("/{member-id}")
     public ResponseEntity deleteMember(@PathVariable("member-id") @Positive long memberId,
-                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
+                                       @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        memberService.deleteMember(memberId, accessToken);
+        memberService.deleteMember(memberId, customUserDetails);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
