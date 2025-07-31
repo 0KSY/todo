@@ -8,6 +8,7 @@ import com.solo.todo.member.mapper.MemberMapper;
 import com.solo.todo.member.service.MemberService;
 import com.solo.todo.utils.UriCreator;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -45,20 +46,22 @@ public class MemberController {
 
     @PatchMapping("/{member-id}")
     public ResponseEntity patchMember(@RequestBody @Valid MemberDto.Patch memberPatchDto,
-                                      @PathVariable("member-id") @Positive long memberId){
+                                      @PathVariable("member-id") @Positive long memberId,
+                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
 
         memberPatchDto.setMemberId(memberId);
 
-        Member member = memberService.updateMember(mapper.memberPatchDtoToMember(memberPatchDto));
+        Member member = memberService.updateMember(mapper.memberPatchDtoToMember(memberPatchDto), accessToken);
 
         return new ResponseEntity(new SingleResponseDto<>(mapper.memberToMemberResponseDto(member)), HttpStatus.OK);
 
     }
 
     @GetMapping("/{member-id}")
-    public ResponseEntity getMember(@PathVariable("member-id") @Positive long memberId){
+    public ResponseEntity getMember(@PathVariable("member-id") @Positive long memberId,
+                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
 
-        Member member = memberService.findMember(memberId);
+        Member member = memberService.findMember(memberId, accessToken);
 
         return new ResponseEntity(new SingleResponseDto<>(mapper.memberToMemberResponseDto(member)), HttpStatus.OK);
 
@@ -78,9 +81,10 @@ public class MemberController {
     }
 
     @DeleteMapping("/{member-id}")
-    public ResponseEntity deleteMember(@PathVariable("member-id") @Positive long memberId){
+    public ResponseEntity deleteMember(@PathVariable("member-id") @Positive long memberId,
+                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken){
 
-        memberService.deleteMember(memberId);
+        memberService.deleteMember(memberId, accessToken);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

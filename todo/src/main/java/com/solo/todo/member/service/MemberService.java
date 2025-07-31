@@ -1,5 +1,6 @@
 package com.solo.todo.member.service;
 
+import com.solo.todo.auth.jwt.JwtTokenizer;
 import com.solo.todo.auth.utils.CustomAuthorityUtils;
 import com.solo.todo.exception.BusinessLogicException;
 import com.solo.todo.exception.ExceptionCode;
@@ -22,12 +23,14 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final CustomAuthorityUtils customAuthorityUtils;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenizer jwtTokenizer;
 
-    public MemberService(MemberRepository memberRepository,
-                         CustomAuthorityUtils customAuthorityUtils, PasswordEncoder passwordEncoder) {
+    public MemberService(MemberRepository memberRepository, CustomAuthorityUtils customAuthorityUtils,
+                         PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer) {
         this.memberRepository = memberRepository;
         this.customAuthorityUtils = customAuthorityUtils;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenizer = jwtTokenizer;
     }
 
     public Member findVerifiedMember(long memberId){
@@ -55,6 +58,16 @@ public class MemberService {
         }
     }
 
+    public void checkMemberId(long memberId, String accessToken){
+
+        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
+        long findMemberId = jwtTokenizer.getMemberIdFromAccessToken(accessToken, base64EncodedSecretKey);
+
+        if(memberId != findMemberId){
+            throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_MATCHED);
+        }
+    }
+
     public Member createMember(Member member){
 
         verifyExistsEmail(member.getEmail());
@@ -69,8 +82,10 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public Member updateMember(Member member){
+    public Member updateMember(Member member, String accessToken){
         Member findMember = findVerifiedMember(member.getMemberId());
+
+        checkMemberId(findMember.getMemberId(), accessToken);
 
         Optional.ofNullable(member.getNickname())
                         .ifPresent(nickname -> {
@@ -86,9 +101,11 @@ public class MemberService {
 
     }
 
-    public Member findMember(long memberId){
+    public Member findMember(long memberId, String accessToken){
 
         Member findMember = findVerifiedMember(memberId);
+
+        checkMemberId(findMember.getMemberId(), accessToken);
 
         return findMember;
     }
@@ -99,8 +116,9 @@ public class MemberService {
         );
     }
 
-    public void deleteMember(long memberId){
+    public void deleteMember(long memberId, String accessToken){
         Member findMember = findVerifiedMember(memberId);
+        checkMemberId(findMember.getMemberId(), accessToken);
 
         memberRepository.delete(findMember);
     }
