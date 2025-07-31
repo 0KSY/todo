@@ -3,6 +3,7 @@ package com.solo.todo.todo.service;
 
 import com.solo.todo.exception.BusinessLogicException;
 import com.solo.todo.exception.ExceptionCode;
+import com.solo.todo.member.service.MemberService;
 import com.solo.todo.todo.entity.Todo;
 import com.solo.todo.todo.repository.TodoRepository;
 import org.springframework.data.domain.Page;
@@ -18,9 +19,11 @@ import java.util.Optional;
 public class TodoService {
 
     private final TodoRepository todoRepository;
+    private final MemberService memberService;
 
-    public TodoService(TodoRepository todoRepository) {
+    public TodoService(TodoRepository todoRepository, MemberService memberService) {
         this.todoRepository = todoRepository;
+        this.memberService = memberService;
     }
 
     public Todo findVerifiedTodo(long todoId){
@@ -33,11 +36,16 @@ public class TodoService {
 
     }
 
-    public Todo createTodo(Todo todo){
+    public Todo createTodo(Todo todo, String accessToken){
+
+        memberService.checkMemberId(todo.getMember().getMemberId(), accessToken);
+
         return todoRepository.save(todo);
     }
 
-    public Todo updateTodo(Todo todo){
+    public Todo updateTodo(Todo todo, String accessToken){
+
+        memberService.checkMemberId(todo.getMember().getMemberId(), accessToken);
 
         Todo findTodo = findVerifiedTodo(todo.getTodoId());
 
@@ -55,18 +63,36 @@ public class TodoService {
 
     }
 
-    public Todo findTodo(long todoId){
-        return findVerifiedTodo(todoId);
-    }
+    public Todo findTodo(long todoId, String accessToken){
 
-    public Page<Todo> findTodos(int page, int size){
-        return todoRepository.findAll(
-                PageRequest.of(page, size, Sort.by("todoId").descending())
-        );
-    }
-
-    public void deleteTodo(long todoId){
         Todo findTodo = findVerifiedTodo(todoId);
+
+        memberService.checkMemberId(findTodo.getMember().getMemberId(), accessToken);
+
+        return findTodo;
+    }
+
+    public Page<Todo> findTodos(int page, int size, String accessToken){
+
+        Page<Todo> pageTodos = todoRepository.findAll(
+                PageRequest.of(page, size, Sort.by("todoId").descending()));
+
+        if(pageTodos.isEmpty()){
+            return pageTodos;
+        }
+
+        Todo todo = pageTodos.getContent().get(0);
+
+        memberService.checkMemberId(todo.getMember().getMemberId(), accessToken);
+
+        return pageTodos;
+
+    }
+
+    public void deleteTodo(long todoId, String accessToken){
+        Todo findTodo = findVerifiedTodo(todoId);
+
+        memberService.checkMemberId(findTodo.getMember().getMemberId(), accessToken);
 
         todoRepository.delete(findTodo);
     }

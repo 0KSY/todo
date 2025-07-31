@@ -93,4 +93,20 @@ public class JwtTokenizer {
 
         return claims;
     }
+
+    public long getMemberIdFromAccessToken(String accessToken, String base64EncodedSecretKey){
+        String jws = accessToken.replace("Bearer ", "");
+
+        Key key = getKeyFromBase64EncodedSecretKey(base64EncodedSecretKey);
+
+        Map<String, Object> claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(jws)
+                .getBody();
+
+        int memberId = (int) claims.get("memberId");
+
+        return (long) memberId;
+    }
 }

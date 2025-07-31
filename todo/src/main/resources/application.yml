@@ -34,5 +34,5 @@ mail:
     admin: admin@gmail.com
 jwt:
   key: aaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbb
-  access-token-expiration-minutes: 1
-  refresh-token-expiration-minutes: 1
+  access-token-expiration-minutes: 60
+  refresh-token-expiration-minutes: 60
