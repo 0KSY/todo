@@ -33,6 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         CustomUserDetails customUserDetails = new CustomUserDetails();
         customUserDetails.setMemberId(findMember.getMemberId());
         customUserDetails.setEmail(findMember.getEmail());
+        customUserDetails.setNickname(findMember.getNickname());
         customUserDetails.setPassword(findMember.getPassword());
         customUserDetails.setRoles(findMember.getRoles());
 
