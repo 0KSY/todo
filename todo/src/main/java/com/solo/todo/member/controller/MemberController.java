@@ -92,4 +92,15 @@ public class MemberController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping("/renewAccessToken")
+    public ResponseEntity renewAccessToken(@RequestHeader("Refresh") String refreshToken){
+
+        String accessToken = memberService.renewAccessToken(refreshToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", accessToken);
+
+        return new ResponseEntity(headers, HttpStatus.OK);
+    }
+
 }
