@@ -87,6 +87,23 @@ include::{snippets}/delete-member/request-headers.adoc[]
 include::{snippets}/delete-member/http-response.adoc[]
 
 
+=== 액세스 토큰 갱신
+.curl-request
+include::{snippets}/renew-accessToken/curl-request.adoc[]
+
+.http-request
+include::{snippets}/renew-accessToken/http-request.adoc[]
+
+.request-headers
+include::{snippets}/renew-accessToken/request-headers.adoc[]
+
+.http-response
+include::{snippets}/renew-accessToken/http-response.adoc[]
+
+.response-headers
+include::{snippets}/renew-accessToken/response-headers.adoc[]
+
+
 ***
 == Spring Security
 === 로그인

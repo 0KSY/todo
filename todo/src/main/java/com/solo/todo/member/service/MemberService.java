@@ -14,8 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -125,5 +124,26 @@ public class MemberService {
         }
 
         memberRepository.delete(findMember);
+    }
+
+    public String renewAccessToken(String refreshToken){
+
+        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
+
+        int findMemberId = (int) jwtTokenizer.getClaims(refreshToken, base64EncodedSecretKey).getBody().get("memberId");
+
+        Member findMember = findVerifiedMember((long) findMemberId);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("memberId", findMember.getMemberId());
+        claims.put("username", findMember.getEmail());
+        claims.put("roles", findMember.getRoles());
+
+        String subject = findMember.getEmail();
+        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
+
+        return "Bearer " + jwtTokenizer.generateAccessToken(claims, subject, expiration, base64EncodedSecretKey);
+
+
     }
 }

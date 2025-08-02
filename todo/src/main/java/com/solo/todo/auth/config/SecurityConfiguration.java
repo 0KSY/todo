@@ -55,6 +55,7 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers(HttpMethod.POST, "/members").permitAll()
+                        .antMatchers(HttpMethod.POST, "/members/renewAccessToken").permitAll()
                         .antMatchers(HttpMethod.GET, "/members").hasRole("ADMIN")
                         .antMatchers("/members/**").hasRole("USER")
                         .antMatchers("/todos/**").hasRole("USER")

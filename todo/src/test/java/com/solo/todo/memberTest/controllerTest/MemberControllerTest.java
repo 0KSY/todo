@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -266,6 +267,34 @@ public class MemberControllerTest {
                 ));
 
     }
+
+    @Test
+    void renewAccessToken() throws Exception{
+
+        given(memberService.renewAccessToken(Mockito.any(String.class))).willReturn("Access Token");
+
+        ResultActions resultActions = mockMvc.perform(
+                post("/members/renewAccessToken")
+                        .header("Refresh", "Refresh Token")
+        );
+
+        resultActions.andExpect(status().isOk())
+                .andExpect(header().string("Authorization", is("Access Token")))
+                .andDo(document(
+                        "renew-accessToken",
+                        getRequestPreprocessor(),
+                        getResponsePreprocessor(),
+                        requestHeaders(
+                                headerWithName("Refresh").description("Refresh Token")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        )
+                ));
+
+    }
+
+
 
 
 
