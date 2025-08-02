@@ -78,7 +78,7 @@ public class TodoService {
         long memberId = customUserDetails.getMemberId();
 
         return todoRepository.findAllByMember_MemberId(
-                memberId, PageRequest.of(page, size, Sort.by("todoId").descending()));
+                memberId, PageRequest.of(page, size, Sort.by("todoId")));
 
     }
 
