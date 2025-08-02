@@ -84,9 +84,10 @@ public class MemberController {
 
     @DeleteMapping("/{member-id}")
     public ResponseEntity deleteMember(@PathVariable("member-id") @Positive long memberId,
+                                       @RequestBody @Valid MemberDto.Password passwordDto,
                                        @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        memberService.deleteMember(memberId, customUserDetails);
+        memberService.deleteMember(memberId, passwordDto.getPassword(), customUserDetails);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

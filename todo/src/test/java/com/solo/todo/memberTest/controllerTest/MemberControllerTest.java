@@ -234,11 +234,19 @@ public class MemberControllerTest {
     @Test
     void deleteMemberTest() throws Exception{
 
-        doNothing().when(memberService).deleteMember(Mockito.any(long.class), Mockito.any(CustomUserDetails.class));
+        MemberDto.Password passwordDto = new MemberDto.Password();
+        passwordDto.setPassword("1234");
+
+        String requestBody = gson.toJson(passwordDto);
+
+        doNothing().when(memberService).deleteMember(Mockito.any(long.class), Mockito.any(String.class),
+                Mockito.any(CustomUserDetails.class));
 
         ResultActions resultActions = mockMvc.perform(
                 delete("/members/{member-id}", 1)
                         .header(HttpHeaders.AUTHORIZATION, "Access Token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
         );
 
         resultActions.andExpect(status().isNoContent())
@@ -251,6 +259,9 @@ public class MemberControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                         )
                 ));
 
