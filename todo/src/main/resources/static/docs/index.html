@@ -702,8 +702,8 @@ Content-Length: 246
     "email" : "hgd@naver.com",
     "nickname" : "홍길동",
     "memberStatus" : "MEMBER_ACTIVE",
-    "createdAt" : "2025-08-02T14:15:48.6300186",
-    "modifiedAt" : "2025-08-02T14:15:48.6300186"
+    "createdAt" : "2025-08-02T14:54:47.5297708",
+    "modifiedAt" : "2025-08-02T14:54:47.5297708"
   }
 }</code></pre>
 </div>
@@ -840,8 +840,8 @@ Content-Length: 246
     "email" : "hgd@naver.com",
     "nickname" : "홍길동",
     "memberStatus" : "MEMBER_ACTIVE",
-    "createdAt" : "2025-08-02T14:15:49.4519897",
-    "modifiedAt" : "2025-08-02T14:15:49.4519897"
+    "createdAt" : "2025-08-02T14:54:48.5258933",
+    "modifiedAt" : "2025-08-02T14:54:48.5258933"
   }
 }</code></pre>
 </div>
@@ -905,15 +905,25 @@ Content-Length: 246
 <div class="title">curl-request</div>
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="bash">$ curl 'http://localhost:8080/members/1' -i -X DELETE \
-    -H 'Authorization: Access Token'</code></pre>
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'Authorization: Access Token' \
+    -d '{
+  "password" : "1234"
+}'</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">http-request</div>
 <div class="content">
 <pre class="prettyprint highlight nowrap"><code data-lang="http">DELETE /members/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
 Authorization: Access Token
-Host: localhost:8080</code></pre>
+Content-Length: 27
+Host: localhost:8080
+
+{
+  "password" : "1234"
+}</code></pre>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -1039,8 +1049,8 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJVU0VSIl0sIm1lbWJlcklkIjoxLCJ1c2VybmFtZSI6ImhnZEBuYXZlci5jb20iLCJzdWIiOiJoZ2RAbmF2ZXIuY29tIiwiaWF0IjoxNzU0MTExNzUyLCJleHAiOjE3NTQxMTUzNTJ9.FPUNfRt9nRlfB0p-S7ZxiR74a4YpPZE_ENtxWPZyNkA
-Refresh: eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6MSwic3ViIjoiaGdkQG5hdmVyLmNvbSIsImlhdCI6MTc1NDExMTc1MiwiZXhwIjoxNzU0MTE1MzUyfQ.VmtVHZEBdzwTkbqY_BIBfykkP7SlByeAX-Rkipi9nMI
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJVU0VSIl0sIm1lbWJlcklkIjoxLCJ1c2VybmFtZSI6ImhnZEBuYXZlci5jb20iLCJzdWIiOiJoZ2RAbmF2ZXIuY29tIiwiaWF0IjoxNzU0MTE0MDkyLCJleHAiOjE3NTQxMTc2OTJ9.c_CyNm4pK66HoGlnPScyW3cO9T9BS39i_Dk3i4JqyV8
+Refresh: eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6MSwic3ViIjoiaGdkQG5hdmVyLmNvbSIsImlhdCI6MTc1NDExNDA5MiwiZXhwIjoxNzU0MTE3NjkyfQ.FV3a-PW9Qq3s0_CEI9i4-4vmrTbnDZZqFmBg88CUqLY
 Content-Type: application/json;charset=UTF-8
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
@@ -1364,8 +1374,8 @@ Content-Length: 227
     "title" : "제목",
     "description" : "내용",
     "isCompleted" : "NONE",
-    "createdAt" : "2025-08-02T14:15:54.9077678",
-    "modifiedAt" : "2025-08-02T14:15:54.9077678"
+    "createdAt" : "2025-08-02T14:54:55.3898451",
+    "modifiedAt" : "2025-08-02T14:54:55.3898451"
   }
 }</code></pre>
 </div>
@@ -1502,8 +1512,8 @@ Content-Length: 227
     "title" : "제목",
     "description" : "내용",
     "isCompleted" : "NONE",
-    "createdAt" : "2025-08-02T14:15:54.9617654",
-    "modifiedAt" : "2025-08-02T14:15:54.9617654"
+    "createdAt" : "2025-08-02T14:54:55.4498434",
+    "modifiedAt" : "2025-08-02T14:54:55.4498434"
   }
 }</code></pre>
 </div>
@@ -1636,7 +1646,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: SAMEORIGIN
-Content-Length: 551
+Content-Length: 548
 
 {
   "data" : [ {
@@ -1644,15 +1654,15 @@ Content-Length: 551
     "title" : "제목",
     "description" : "내용",
     "isCompleted" : "NONE",
-    "createdAt" : "2025-08-02T14:15:54.8269159",
-    "modifiedAt" : "2025-08-02T14:15:54.8269159"
+    "createdAt" : "2025-08-02T14:54:55.2928419",
+    "modifiedAt" : "2025-08-02T14:54:55.293841"
   }, {
     "todoId" : 2,
     "title" : "제목2",
     "description" : "내용2",
     "isCompleted" : "NONE",
-    "createdAt" : "2025-08-02T14:15:54.8269159",
-    "modifiedAt" : "2025-08-02T14:15:54.8269159"
+    "createdAt" : "2025-08-02T14:54:55.293841",
+    "modifiedAt" : "2025-08-02T14:54:55.293841"
   } ],
   "pageInfo" : {
     "page" : 1,
@@ -1818,7 +1828,7 @@ X-Frame-Options: SAMEORIGIN</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2025-08-02 13:26:50 +0900
+Last updated 2025-08-02 14:20:09 +0900
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

@@ -35,6 +35,14 @@ public class MemberDto {
 
     @Getter
     @Setter
+    public static class Password{
+
+        @NotBlank
+        private String password;
+    }
+
+    @Getter
+    @Setter
     @Builder
     public static class Response{
 
