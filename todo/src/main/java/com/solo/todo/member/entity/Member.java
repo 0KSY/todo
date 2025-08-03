@@ -22,7 +22,6 @@ public class Member extends Auditable {
     @Column(nullable = false, unique = true, updatable = false)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, unique = true)
@@ -35,6 +34,9 @@ public class Member extends Auditable {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private SignupType signupType;
+
     public enum MemberStatus{
         MEMBER_ACTIVE("활동중"),
         MEMBER_SLEEP("휴면 상태"),
@@ -46,6 +48,11 @@ public class Member extends Auditable {
         MemberStatus(String status) {
             this.status = status;
         }
+    }
+
+    public enum SignupType{
+        SERVER,
+        GOOGLE_OAUTH2;
     }
 
 

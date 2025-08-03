@@ -18,6 +18,18 @@ spring:
     init:
       data-locations: classpath*:db/h2/data.sql
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: ${G_CLIENT_ID}
+            clientSecret:  ${G_CLIENT_SECRET}
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            scope:
+              - email
+              - profile
+
 logging:
   level:
     org:

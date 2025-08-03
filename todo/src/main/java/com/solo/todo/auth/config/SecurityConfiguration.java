@@ -2,12 +2,10 @@ package com.solo.todo.auth.config;
 
 import com.solo.todo.auth.filter.JwtAuthenticationFilter;
 import com.solo.todo.auth.filter.JwtVerificationFilter;
-import com.solo.todo.auth.handler.CustomAccessDeniedHandler;
-import com.solo.todo.auth.handler.CustomAuthenticationEntryPoint;
-import com.solo.todo.auth.handler.CustomAuthenticationFailureHandler;
-import com.solo.todo.auth.handler.CustomAuthenticationSuccessHandler;
+import com.solo.todo.auth.handler.*;
 import com.solo.todo.auth.jwt.JwtTokenizer;
 import com.solo.todo.auth.utils.CustomAuthorityUtils;
+import com.solo.todo.member.repository.MemberRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,10 +28,14 @@ public class SecurityConfiguration {
 
     private final JwtTokenizer jwtTokenizer;
     private final CustomAuthorityUtils customAuthorityUtils;
+    private final MemberRepository memberRepository;
 
-    public SecurityConfiguration(JwtTokenizer jwtTokenizer, CustomAuthorityUtils customAuthorityUtils) {
+    public SecurityConfiguration(JwtTokenizer jwtTokenizer,
+                                 CustomAuthorityUtils customAuthorityUtils,
+                                 MemberRepository memberRepository) {
         this.jwtTokenizer = jwtTokenizer;
         this.customAuthorityUtils = customAuthorityUtils;
+        this.memberRepository = memberRepository;
     }
 
     @Bean
@@ -59,6 +61,9 @@ public class SecurityConfiguration {
                         .antMatchers(HttpMethod.GET, "/members").hasRole("ADMIN")
                         .antMatchers("/members/**").hasRole("USER")
                         .antMatchers("/todos/**").hasRole("USER")
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(new OAuth2LoginSuccessHandler(jwtTokenizer, customAuthorityUtils, memberRepository))
                 );
 
         return http.build();
