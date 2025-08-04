@@ -58,6 +58,8 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+	implementation 'mysql:mysql-connector-java:8.0.28'
+
 
 }
 
