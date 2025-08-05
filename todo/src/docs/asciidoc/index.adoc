@@ -171,7 +171,7 @@ include::{snippets}/patch-todo/http-response.adoc[]
 include::{snippets}/patch-todo/response-fields.adoc[]
 
 
-=== 투주 조회
+=== 투두 조회
 .curl-request
 include::{snippets}/get-todo/curl-request.adoc[]
 
@@ -226,10 +226,6 @@ include::{snippets}/delete-todo/request-headers.adoc[]
 
 .http-response
 include::{snippets}/delete-todo/http-response.adoc[]
-
-
-
-
 
 
 
