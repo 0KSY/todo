@@ -1,22 +1,25 @@
 package com.solo.todo.todo.entity;
 
-import com.solo.todo.audit.Auditable;
 import com.solo.todo.member.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Todo extends Auditable {
+public class Todo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long todoId;
+
+    @Column(nullable = false)
+    private LocalDate date;
 
     @Column(nullable = false)
     private String title;

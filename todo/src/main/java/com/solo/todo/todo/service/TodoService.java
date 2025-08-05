@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -73,12 +74,12 @@ public class TodoService {
         return findTodo;
     }
 
-    public Page<Todo> findTodos(int page, int size, CustomUserDetails customUserDetails){
+    public Page<Todo> findTodos(int page, int size, LocalDate date, CustomUserDetails customUserDetails){
 
         long memberId = customUserDetails.getMemberId();
 
-        return todoRepository.findAllByMember_MemberId(
-                memberId, PageRequest.of(page, size, Sort.by("todoId")));
+        return todoRepository.findAllByMember_MemberIdAndDate(
+                memberId, date, PageRequest.of(page, size, Sort.by("todoId")));
 
     }
 

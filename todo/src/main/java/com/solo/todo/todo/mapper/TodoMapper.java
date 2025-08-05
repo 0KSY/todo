@@ -16,6 +16,7 @@ public interface TodoMapper {
         member.setMemberId(todoPostDto.getMemberId());
 
         Todo todo = new Todo();
+        todo.setDate(todoPostDto.getDate());
         todo.setTitle(todoPostDto.getTitle());
         todo.setDescription(todoPostDto.getDescription());
         todo.setMember(member);

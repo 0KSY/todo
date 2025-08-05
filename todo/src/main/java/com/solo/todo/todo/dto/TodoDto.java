@@ -6,14 +6,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class TodoDto {
 
     @Getter
     @Setter
     public static class Post{
+
+        @NotNull
+        private LocalDate date;
         @NotBlank
         private String title;
         @NotBlank
@@ -36,10 +40,9 @@ public class TodoDto {
     @Builder
     public static class Response{
         private long todoId;
+        private LocalDate date;
         private String title;
         private String description;
         private Todo.IsCompleted isCompleted;
-        private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
     }
 }

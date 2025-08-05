@@ -9,7 +9,7 @@ import com.solo.todo.todo.mapper.TodoMapper;
 import com.solo.todo.todo.service.TodoService;
 import com.solo.todo.utils.UriCreator;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -72,9 +73,10 @@ public class TodoController {
     @GetMapping
     public ResponseEntity getTodos(@RequestParam @Positive int page,
                                    @RequestParam @Positive int size,
+                                   @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
                                    @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        Page<Todo> pageTodos = todoService.findTodos(page-1, size, customUserDetails);
+        Page<Todo> pageTodos = todoService.findTodos(page-1, size, date, customUserDetails);
         List<Todo> todos = pageTodos.getContent();
 
         return new ResponseEntity(
