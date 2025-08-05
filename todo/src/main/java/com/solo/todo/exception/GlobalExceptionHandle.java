@@ -1,5 +1,7 @@
 package com.solo.todo.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -37,6 +39,25 @@ public class GlobalExceptionHandle {
         response.setStatusAndMessageFromExceptionCode(e.getExceptionCode());
 
         return new ResponseEntity(response, HttpStatus.valueOf(e.getExceptionCode().getStatus()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity handleSignatureException(SignatureException se){
+
+        ErrorResponse response = new ErrorResponse();
+        response.setStatusAndMessageFromHttpStatus(HttpStatus.UNAUTHORIZED);
+
+        return new ResponseEntity(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity handleExpiredJwtException(ExpiredJwtException ee){
+
+        ErrorResponse response = new ErrorResponse();
+        response.setStatusAndMessageFromHttpStatusAndMessage(
+                HttpStatus.UNAUTHORIZED, "RefreshToken expired");
+
+        return new ResponseEntity(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler
