@@ -1,6 +1,9 @@
 package com.solo.todo.todoTest.controllerTest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import com.solo.todo.auth.userDetailsService.CustomUserDetails;
 import com.solo.todo.auth.utils.CustomAuthorityUtils;
 import com.solo.todo.todo.dto.TodoDto;
@@ -27,7 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.solo.todo.utils.ApiDocumentUtils.getRequestPreprocessor;
@@ -67,36 +70,39 @@ public class TodoControllerTest {
     private TodoDto.Patch todoPatchDto;
     private TodoDto.Response response;
     private TodoDto.Response response2;
+    private LocalDate date;
 
     @BeforeEach
     void init(){
 
+        date = LocalDate.now();
+
         todo = new Todo();
         todo.setTodoId(1L);
+        todo.setDate(date);
         todo.setTitle("제목");
         todo.setDescription("내용");
 
         todo2 = new Todo();
         todo2.setTodoId(2L);
+        todo2.setDate(date);
         todo2.setTitle("제목2");
         todo2.setDescription("내용");
 
         response = TodoDto.Response.builder()
                 .todoId(1L)
+                .date(date)
                 .title("제목")
                 .description("내용")
                 .isCompleted(Todo.IsCompleted.NONE)
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
                 .build();
 
         response2 = TodoDto.Response.builder()
                 .todoId(2L)
+                .date(date)
                 .title("제목2")
                 .description("내용2")
                 .isCompleted(Todo.IsCompleted.NONE)
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
                 .build();
 
         CustomUserDetails customUserDetails = new CustomUserDetails();
@@ -116,8 +122,14 @@ public class TodoControllerTest {
     @Test
     void postTodoTest() throws Exception{
 
+        gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (
+                        src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
+                .create();
+
         todoPostDto = new TodoDto.Post();
         todoPostDto.setTitle("제목");
+        todoPostDto.setDate(date);
         todoPostDto.setDescription("내용");
         todoPostDto.setMemberId(1L);
 
@@ -144,6 +156,7 @@ public class TodoControllerTest {
                         ),
                         requestFields(
                                 List.of(
+                                        fieldWithPath("date").type(JsonFieldType.STRING).description("날짜 : yyyy-MM-dd"),
                                         fieldWithPath("title").type(JsonFieldType.STRING).description("제목"),
                                         fieldWithPath("description").type(JsonFieldType.STRING).description("내용"),
                                         fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자")
@@ -204,12 +217,11 @@ public class TodoControllerTest {
                                 List.of(
                                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("데이터"),
                                         fieldWithPath("data.todoId").type(JsonFieldType.NUMBER).description("투두 식별자"),
+                                        fieldWithPath("data.date").type(JsonFieldType.STRING).description("날짜 : yyyy-MM-dd"),
                                         fieldWithPath("data.title").type(JsonFieldType.STRING).description("제목"),
                                         fieldWithPath("data.description").type(JsonFieldType.STRING).description("내용"),
                                         fieldWithPath("data.isCompleted").type(JsonFieldType.STRING).
-                                                description("완료 여부 : NONE / DONE"),
-                                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 시간"),
-                                        fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("수정 시간")
+                                                description("완료 여부 : NONE / DONE")
                                 )
                         )
                 ));
@@ -243,12 +255,11 @@ public class TodoControllerTest {
                                 List.of(
                                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("데이터"),
                                         fieldWithPath("data.todoId").type(JsonFieldType.NUMBER).description("투두 식별자"),
+                                        fieldWithPath("data.date").type(JsonFieldType.STRING).description("날짜 : yyyy-MM-dd"),
                                         fieldWithPath("data.title").type(JsonFieldType.STRING).description("제목"),
                                         fieldWithPath("data.description").type(JsonFieldType.STRING).description("내용"),
                                         fieldWithPath("data.isCompleted").type(JsonFieldType.STRING)
-                                                .description("완료 여부 : NONE / DONE"),
-                                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 시간"),
-                                        fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("수정 시간")
+                                                .description("완료 여부 : NONE / DONE")
                                 )
                         )
                 ));
@@ -260,7 +271,8 @@ public class TodoControllerTest {
         Page<Todo> pageTodos = new PageImpl<>(List.of(todo, todo2),
                 PageRequest.of(0, 5, Sort.by("todoId")),2);
 
-        given(todoService.findTodos(Mockito.any(int.class), Mockito.any(int.class),Mockito.any(CustomUserDetails.class)))
+        given(todoService.findTodos(
+                Mockito.any(int.class), Mockito.any(int.class),Mockito.any(LocalDate.class),Mockito.any(CustomUserDetails.class)))
                 .willReturn(pageTodos);
         given(mapper.todosToTodoResponseDtos(Mockito.any(List.class))).willReturn(List.of(response, response2));
 
@@ -268,6 +280,7 @@ public class TodoControllerTest {
                 get("/todos")
                         .queryParam("page", "1")
                         .queryParam("size", "5")
+                        .queryParam("date", String.valueOf(date))
                         .header(HttpHeaders.AUTHORIZATION, "Access Token")
                         .accept(MediaType.APPLICATION_JSON)
         );
@@ -282,7 +295,8 @@ public class TodoControllerTest {
                         requestParameters(
                                 List.of(
                                         parameterWithName("page").description("페이지 번호"),
-                                        parameterWithName("size").description("페이지 크기")
+                                        parameterWithName("size").description("페이지 크기"),
+                                        parameterWithName("date").description("날짜 : yyyy-MM-dd")
                                 )
                         ),
                         requestHeaders(
@@ -292,12 +306,11 @@ public class TodoControllerTest {
                                 List.of(
                                         fieldWithPath("data").type(JsonFieldType.ARRAY).description("데이터"),
                                         fieldWithPath("data[].todoId").type(JsonFieldType.NUMBER).description("투두 식별자"),
+                                        fieldWithPath("data[].date").type(JsonFieldType.STRING).description("날짜 : yyyy-MM-dd"),
                                         fieldWithPath("data[].title").type(JsonFieldType.STRING).description("제목"),
                                         fieldWithPath("data[].description").type(JsonFieldType.STRING).description("내용"),
                                         fieldWithPath("data[].isCompleted").type(JsonFieldType.STRING)
                                                 .description("완료 상태 : NONE / DONE"),
-                                        fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("생성 시간"),
-                                        fieldWithPath("data[].modifiedAt").type(JsonFieldType.STRING).description("수정 시간"),
                                         fieldWithPath("pageInfo").type(JsonFieldType.OBJECT).description("페이지 정보"),
                                         fieldWithPath("pageInfo.page").type(JsonFieldType.NUMBER).description("페이지 번호"),
                                         fieldWithPath("pageInfo.size").type(JsonFieldType.NUMBER).description("페이지 크기"),

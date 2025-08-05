@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolationException;
 
@@ -23,7 +24,7 @@ public class GlobalExceptionHandle {
 
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }
-
+    
     @ExceptionHandler
     public ResponseEntity handleConstraintViolationException(ConstraintViolationException e){
 
@@ -31,6 +32,16 @@ public class GlobalExceptionHandle {
         response.setConstraintViolationErrors(e.getConstraintViolations());
 
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e){
+        ErrorResponse response = new ErrorResponse();
+        response.setStatusAndMessageFromHttpStatusAndMessage(
+                HttpStatus.BAD_REQUEST, "'" + e.getName() + "' has a type mismatch");
+
+        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+
     }
 
     @ExceptionHandler
@@ -42,7 +53,7 @@ public class GlobalExceptionHandle {
     }
 
     @ExceptionHandler
-    public ResponseEntity handleSignatureException(SignatureException se){
+    public ResponseEntity handleSignatureException(SignatureException e){
 
         ErrorResponse response = new ErrorResponse();
         response.setStatusAndMessageFromHttpStatus(HttpStatus.UNAUTHORIZED);
@@ -51,7 +62,7 @@ public class GlobalExceptionHandle {
     }
 
     @ExceptionHandler
-    public ResponseEntity handleExpiredJwtException(ExpiredJwtException ee){
+    public ResponseEntity handleExpiredJwtException(ExpiredJwtException e){
 
         ErrorResponse response = new ErrorResponse();
         response.setStatusAndMessageFromHttpStatusAndMessage(
